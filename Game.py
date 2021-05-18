@@ -13,6 +13,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 window.fill((100,100,0))
+print('hello')
+
 pygame.display.update()
 pygame.quit()
 

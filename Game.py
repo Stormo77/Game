@@ -2,21 +2,25 @@
 import pygame
 
 pygame.init()
+clock = pygame.time.Clock()
 #the code for your game has to go between these two lines
 
 #create a window object
 window = pygame.display.set_mode((640,480))
 MyRect = pygame.Rect(30,30,100,50)
+Boom = pygame.Rect(230,30,100,50)
 #create a game loop
 running = True #game state
   #color the window background
 Color = (130, 252, 100)
+Color2 = (0,0,100)
 Black = (0,0,0)
 window.fill((Black))
-Left  = (-10, 0)
-Right = (10, 0)
-Up    = (0, -10)
-Down  = (0, 10)
+Left  = (-5, 0)
+Right = (5, 0)
+Up    = (0, -5)
+Down  = (0, 5)
+direction = (0,0)
 rect  = False
 while running:
     #get all events that have happened since last loop
@@ -39,25 +43,44 @@ while running:
                 running = False
             if event.key == pygame.K_RETURN and not rect:
               pygame.draw.rect(window,Color, MyRect)
+              pygame.draw.rect(window,Color2, Boom)
               rect = True
             elif rect and event.key == pygame.K_RETURN:
                rect = False 
             #moves the object in a direction                    
             elif event.key == pygame.K_w and rect:
-              MyRect.move_ip   (Up)
+              direction = Up
             elif event.key == pygame.K_s and rect:      
-              MyRect.move_ip (Down)   
+              direction = Down   
             elif event.key == pygame.K_a and rect:  
-              MyRect.move_ip (Left)
+              direction = Left
             elif event.key == pygame.K_d and rect: 
-              MyRect.move_ip(Right)
-              
-  
+              direction = Right
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            #if a mouse button event happened do this
+            #get the position of the mouse
+          mouse_position = event.pos
+            #change the position of the rectangle
+          Boom.center = mouse_position
+        if event.type == pygame.KEYUP: 
+          if event.key == pygame.K_w or pygame.K_a or pygame.K_s or pygame.K_d:   
+           direction = (0,0)
+           #does not work as intended, stops even if its a random key.
         
-        window.fill((Black))
-        if rect:
-          pygame.draw.rect(window,Color,MyRect) 
+    
+    if MyRect.colliderect(Boom):
+      Color = (255,0,10)
+      Color2 = (100,0,0)
+    MyRect.move_ip(direction)
+    window.fill((Black))
+    clock.tick(30)
+    if rect:
+      
+      pygame.draw.rect(window,Color2, Boom)
+      pygame.draw.rect(window,Color,MyRect) 
         #update the display
-        pygame.display.update()
+      pygame.display.update()
+      Color = (130, 252, 100)
+      Color2 = (0,0,100)
 #this code will only run when the loop is stopped
 pygame.quit()

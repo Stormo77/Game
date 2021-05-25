@@ -10,6 +10,7 @@ window = pygame.display.set_mode((640,480))
 space = pygame.Rect(30,30,100,50)
 Boom = pygame.Rect(230,30,100,50)
 Ship = pygame.image.load('ship.png')
+Rock = pygame.image.load('Rock.png')
 #create a game loop
 running = True #game state
   #color the window background
@@ -27,7 +28,11 @@ rect  = False
 Ship = pygame.image.load('ship.png').convert_alpha()
 Ship = pygame.transform.scale(Ship, (50, 50))         
 space = Ship.get_rect()
-        
+Dead = False
+Rock = pygame.image.load('Rock.png').convert_alpha()
+Rock = pygame.transform.scale(Rock, (50, 50))         
+Boom = Rock.get_rect()
+Boom.move_ip (500,400)        
 while running:
   
     #get all events that have happened since last loop
@@ -49,10 +54,10 @@ while running:
                 running = False
             if event.key == pygame.K_RETURN and not rect:
               # pygame.draw.rect(window,Color, space)
-              pygame.draw.rect(window,Color2, Boom)
               rect = True
             elif rect and event.key == pygame.K_RETURN:
                rect = False 
+               Dead = False
             #moves the object in a direction                    
             elif event.key == pygame.K_w and rect:
               direction = Up
@@ -73,12 +78,16 @@ while running:
             elif event.key == pygame.K_RIGHT and rect: 
               direction2 = Right 
                  
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        #elif event.type == pygame.MOUSEMOTION:
+        
             #if a mouse button event happened do this
             #get the position of the mouse
-          mouse_position = event.pos
+            
+          #mouse_position = event.pos
+           
             #change the position of the rectangle
-          Boom.center = mouse_position
+            
+          #Crash.center = mouse_position
         if event.type == pygame.KEYUP: 
           if event.key == pygame.K_w and direction == Up:   
            direction = (0,0)
@@ -100,15 +109,14 @@ while running:
            #does not work as intended, stops even if its a random key.
     
     if space.colliderect(Boom):
-      Color = (255,0,10)
-      Color2 = (100,0,0)
+      Dead = True
     space.move_ip(direction)
     Boom.move_ip(direction2)
     window.fill((Black))
     clock.tick(30)
     if rect:
-      window.blit(Ship,space)
-      pygame.draw.rect(window,Color2, Boom)
+      if not Dead: window.blit(Ship,space)
+      window.blit(Rock,Boom)
         #update the display
       pygame.display.update()
       Color = (130, 252, 100)

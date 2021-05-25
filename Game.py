@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 window = pygame.display.set_mode((640,480))
 MyRect = pygame.Rect(30,30,100,50)
 Boom = pygame.Rect(230,30,100,50)
+Ship = pygame.image.load('ship.png')
 #create a game loop
 running = True #game state
   #color the window background
@@ -22,6 +23,7 @@ Up    = (0, -5)
 Down  = (0, 5)
 direction = (0,0)
 rect  = False
+
 while running:
     #get all events that have happened since last loop
     list_of_events = pygame.event.get()
@@ -29,6 +31,7 @@ while running:
     for event in list_of_events:
         #print each event to console for debuging
         print(event)
+        ShipRect = Ship.get.rect()
         pygame.mouse.get_rel()
         pygame.mouse.set_visible(True)
         pygame.display.update()
@@ -75,7 +78,7 @@ while running:
     window.fill((Black))
     clock.tick(30)
     if rect:
-      
+      window.blit(Ship,ShipRect)
       pygame.draw.rect(window,Color2, Boom)
       pygame.draw.rect(window,Color,MyRect) 
         #update the display

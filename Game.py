@@ -68,8 +68,14 @@ while running:
             #change the position of the rectangle
           Boom.center = mouse_position
         if event.type == pygame.KEYUP: 
-          if event.key == pygame.K_w or pygame.K_a or pygame.K_s or pygame.K_d:   
+          if event.key == pygame.K_w and direction == Up:   
            direction = (0,0)
+          if event.key == pygame.K_a and direction == Left:
+            direction = (0,0)
+          if event.key == pygame.K_s and direction == Down:
+            direction = (0,0)
+          if event.key == pygame.K_d and direction == Right:
+            direction = (0,0)
            #does not work as intended, stops even if its a random key.
     
     if space.colliderect(Boom):

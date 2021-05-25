@@ -22,6 +22,7 @@ Right = (5, 0)
 Up    = (0, -5)
 Down  = (0, 5)
 direction = (0,0)
+direction2 = (0,0)
 rect  = False
 Ship = pygame.image.load('ship.png').convert_alpha()
 Ship = pygame.transform.scale(Ship, (50, 50))         
@@ -61,6 +62,17 @@ while running:
               direction = Left
             elif event.key == pygame.K_d and rect: 
               direction = Right
+           #moves the Boom Object
+           #moves the object in a direction                    
+            elif event.key == pygame.K_UP and rect:
+              direction2 = Up
+            elif event.key == pygame.K_DOWN and rect:      
+              direction2 = Down   
+            elif event.key == pygame.K_LEFT and rect:  
+              direction2 = Left
+            elif event.key == pygame.K_RIGHT and rect: 
+              direction2 = Right 
+                 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             #if a mouse button event happened do this
             #get the position of the mouse
@@ -76,12 +88,22 @@ while running:
             direction = (0,0)
           if event.key == pygame.K_d and direction == Right:
             direction = (0,0)
+          
+          if event.key == pygame.K_UP and direction2 == Up:   
+           direction2 = (0,0)
+          if event.key == pygame.K_LEFT and direction2 == Left:
+            direction2 = (0,0)
+          if event.key == pygame.K_DOWN and direction2 == Down:
+            direction2 = (0,0)
+          if event.key == pygame.K_RIGHT and direction2 == Right:
+            direction2 = (0,0)
            #does not work as intended, stops even if its a random key.
     
     if space.colliderect(Boom):
       Color = (255,0,10)
       Color2 = (100,0,0)
     space.move_ip(direction)
+    Boom.move_ip(direction2)
     window.fill((Black))
     clock.tick(30)
     if rect:

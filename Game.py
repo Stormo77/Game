@@ -7,7 +7,7 @@ clock = pygame.time.Clock()
 
 #create a window object
 window = pygame.display.set_mode((640,480))
-MyRect = pygame.Rect(30,30,100,50)
+space = pygame.Rect(30,30,100,50)
 Boom = pygame.Rect(230,30,100,50)
 Ship = pygame.image.load('ship.png')
 #create a game loop
@@ -23,19 +23,21 @@ Up    = (0, -5)
 Down  = (0, 5)
 direction = (0,0)
 rect  = False
-
+Ship = pygame.image.load('ship.png').convert_alpha()
+Ship = pygame.transform.scale(Ship, (50, 50))         
+space = Ship.get_rect()
+        
 while running:
+  
     #get all events that have happened since last loop
     list_of_events = pygame.event.get()
     #loop through each event in the list
     for event in list_of_events:
         #print each event to console for debuging
         print(event)
-        ShipRect = Ship.get.rect()
         pygame.mouse.get_rel()
         pygame.mouse.set_visible(True)
         pygame.display.update()
-
         if event.type == pygame.QUIT:
             #exit the game if x in the corner clicked
             running = False
@@ -45,7 +47,7 @@ while running:
                 #if the escape key is pressed quit the game.
                 running = False
             if event.key == pygame.K_RETURN and not rect:
-              pygame.draw.rect(window,Color, MyRect)
+              # pygame.draw.rect(window,Color, space)
               pygame.draw.rect(window,Color2, Boom)
               rect = True
             elif rect and event.key == pygame.K_RETURN:
@@ -69,18 +71,16 @@ while running:
           if event.key == pygame.K_w or pygame.K_a or pygame.K_s or pygame.K_d:   
            direction = (0,0)
            #does not work as intended, stops even if its a random key.
-        
     
-    if MyRect.colliderect(Boom):
+    if space.colliderect(Boom):
       Color = (255,0,10)
       Color2 = (100,0,0)
-    MyRect.move_ip(direction)
+    space.move_ip(direction)
     window.fill((Black))
     clock.tick(30)
     if rect:
-      window.blit(Ship,ShipRect)
+      window.blit(Ship,space)
       pygame.draw.rect(window,Color2, Boom)
-      pygame.draw.rect(window,Color,MyRect) 
         #update the display
       pygame.display.update()
       Color = (130, 252, 100)

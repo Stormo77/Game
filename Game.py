@@ -7,8 +7,8 @@ clock = pygame.time.Clock()
 
 #create a window object
 window = pygame.display.set_mode((640,480))
-space = pygame.Rect(30,30,100,50)
-Boom = pygame.Rect(230,30,100,50)
+space = pygame.Rect(0,0,0,0)
+Boom = pygame.Rect(640,480,0,0)
 Ship = pygame.image.load('ship.png')
 Rock = pygame.image.load('Rock.png')
 #create a game loop
@@ -54,18 +54,20 @@ while running:
                 running = False
             if event.key == pygame.K_RETURN and not rect:
               # pygame.draw.rect(window,Color, space)
+              Dead = False
               rect = True
+              space.topleft = (0,0)
+              Boom.bottomright = (640,480)
             elif rect and event.key == pygame.K_RETURN:
                rect = False 
-               Dead = False
             #moves the object in a direction                    
-            elif event.key == pygame.K_w and rect:
+            elif event.key == pygame.K_w and rect and not Dead:
               direction = Up
-            elif event.key == pygame.K_s and rect:      
+            elif event.key == pygame.K_s and rect and not Dead:      
               direction = Down   
-            elif event.key == pygame.K_a and rect:  
-              direction = Left
-            elif event.key == pygame.K_d and rect: 
+            elif event.key == pygame.K_a and rect and not Dead:  
+              direction = Left 
+            elif event.key == pygame.K_d and rect and not Dead: 
               direction = Right
            #moves the Boom Object
            #moves the object in a direction                    

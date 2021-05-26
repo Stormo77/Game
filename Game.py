@@ -109,7 +109,6 @@ while running:
           if event.key == pygame.K_RIGHT and direction2 == Right:
             direction2 = (0,0)
            #does not work as intended, stops even if its a random key.
-    
     if space.colliderect(Boom):
       Dead = True
     space.move_ip(direction)
@@ -123,5 +122,9 @@ while running:
       pygame.display.update()
       Color = (130, 252, 100)
       Color2 = (0,0,100)
+    if space.top < 0 or space.bottom > 480 or space.left < 0 or space.right > 640 :
+      space.topleft = (0,0) 
+    if Boom.top < 0 or Boom.bottom > 480 or Boom.left < 0 or Boom.right > 640 :
+      Boom.bottomright = (640,480)     
 #this code will only run when the loop is stopped
 pygame.quit()

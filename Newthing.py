@@ -10,6 +10,14 @@ running = True #game state
 #color the window background
 Black = (0,0,0)
 window.fill((Black))
+class SpaceShip(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__() 
+        self.surf = pygame.Surface((30, 30))
+        self.surf.fill((128,255,40))
+        self.rect = self.surf.get_rect(center = (0, 100))
+P1 = SpaceShip()
+        
 while running:
     list_of_events = pygame.event.get()
     #loop through each event in the list
@@ -19,6 +27,7 @@ while running:
         pygame.mouse.get_rel()
         pygame.mouse.set_visible(True)
         pygame.display.update()
+    
         if event.type == pygame.QUIT:
             #exit the game if x in the corner clicked
             running = False
@@ -29,3 +38,6 @@ while running:
                 running = False
 #this code will only run when the loop is stopped
 pygame.quit()
+
+
+

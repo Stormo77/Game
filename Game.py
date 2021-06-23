@@ -1,38 +1,88 @@
 #imports the pygame module with all functions and classes
 import pygame
+from pygame.locals import *
+import random
+vec = pygame.math.Vector2
 
 pygame.init()
 clock = pygame.time.Clock()
 #the code for your game has to go between these two lines
 
 #create a window object
-window = pygame.display.set_mode((640,480))
 space = pygame.Rect(0,0,0,0)
-Boom = pygame.Rect(640,480,0,0)
-Ship = pygame.image.load('ship.png')
-Rock = pygame.image.load('Rock.png')
+boom = pygame.Rect(300,0,0,0)
+ship = pygame.image.load('Ship.png')
+rock = pygame.image.load('Rock.png')
 #create a game loop
 running = True #game state
   #color the window background
-Color = (130, 252, 100)
-Color2 = (0,0,100)
-Black = (0,0,0)
-window.fill((Black))
-Left  = (-5, 0)
-Right = (5, 0)
-Up    = (0, -5)
-Down  = (0, 5)
+height = 480
+width = 640
+#colors for game
+color = (130, 252, 100)
+color2 = (0,0,100)
+black = (0,0,0)
+
+
+#Code for the direction that the objects move.
+left  = (-5, 0)
+right = (5, 0)
+up    = (0, -5)
+down  = (0, 5)
+
+
 direction = (0,0)
 direction2 = (0,0)
+
 rect  = False
-Ship = pygame.image.load('ship.png').convert_alpha()
-Ship = pygame.transform.scale(Ship, (50, 50))         
-space = Ship.get_rect()
-Dead = False
-Rock = pygame.image.load('Rock.png').convert_alpha()
-Rock = pygame.transform.scale(Rock, (50, 50))         
-Boom = Rock.get_rect()
-Boom.move_ip (500,400) 
+acc = 0.5
+fric = -0.12
+fps = 60
+ 
+FramePerSec = pygame.time.Clock()
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.surf =pygame.image.load('Ship.png')
+        self.surf.fill((128,255,40))
+        self.rect = self.surf.get_rect()
+        self.dead = False
+    def move(self, direction):
+        self.move_ip = direction
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.surf =pygame.image.load('Rock.png')
+        self.surf.fill((128,255,40))
+        self.rect = self.surf.get_rect()
+        self.dead = False
+
+P1 = Player()
+P2 = Enemy()
+
+all_sprites = pygame.sprite.Group()
+all_sprites.add(P1)
+all_sprites.add(P2)
+
+
+ship = pygame.image.load('ship.png')
+ship = pygame.transform.scale(ship, (150, 150))         
+space = ship.get_rect()
+dead = False
+
+rock = pygame.image.load('Rock.png')
+rock = pygame.transform.scale(rock, (150, 150))         
+boom = rock.get_rect()
+boom.move_ip (500,400) 
+  
+  
+  
+  
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Alien Invaders")  
+#fill window
+window.fill((black))
   
 while running:
     list_of_events = pygame.event.get()
@@ -53,32 +103,32 @@ while running:
                 running = False
             if event.key == pygame.K_RETURN and not rect:
               # pygame.draw.rect(window,Color, space)
-              Dead = False
+              dead = False
               rect = True
               space.topleft = (0,0)
-              Boom.bottomright = (640,480)
+              boom.bottomright = (640,480)
             elif rect and event.key == pygame.K_RETURN:
                rect = False 
             #moves the object in a direction                    
             elif event.key == pygame.K_w and rect:
               
-              direction = Up
+              direction = up
             elif event.key == pygame.K_s and rect:      
-              direction = Down   
+              direction = down   
             elif event.key == pygame.K_a and rect:  
-              direction = Left 
+              direction = left 
             elif event.key == pygame.K_d and rect: 
-              direction = Right
+              direction = right
            #moves the Boom Object
            #moves the object in a direction                    
             elif event.key == pygame.K_UP and rect and not Dead:
-              direction2 = Up
+              direction2 = up
             elif event.key == pygame.K_DOWN and rect and not Dead:      
-              direction2 = Down   
+              direction2 = down   
             elif event.key == pygame.K_LEFT and rect and not Dead:  
-              direction2 = Left
+              direction2 = left
             elif event.key == pygame.K_RIGHT and rect and not Dead: 
-              direction2 = Right 
+              direction2 = right 
                  
         #elif event.type == pygame.MOUSEMOTION:
         
@@ -91,37 +141,37 @@ while running:
             
           #Crash.center = mouse_position
         if event.type == pygame.KEYUP: 
-          if event.key == pygame.K_w and direction == Up:   
+          if event.key == pygame.K_w and direction == up:   
            direction = (0,0)
-          if event.key == pygame.K_a and direction == Left:
+          if event.key == pygame.K_a and direction == left:
             direction = (0,0)
-          if event.key == pygame.K_s and direction == Down:
+          if event.key == pygame.K_s and direction == down:
             direction = (0,0)
-          if event.key == pygame.K_d and direction == Right:
+          if event.key == pygame.K_d and direction == right:
             direction = (0,0)
           
-          if event.key == pygame.K_UP and direction2 == Up:   
+          if event.key == pygame.K_UP and direction2 == up:   
            direction2 = (0,0)
-          if event.key == pygame.K_LEFT and direction2 == Left:
+          if event.key == pygame.K_LEFT and direction2 == left:
             direction2 = (0,0)
-          if event.key == pygame.K_DOWN and direction2 == Down:
+          if event.key == pygame.K_DOWN and direction2 == down:
             direction2 = (0,0)
-          if event.key == pygame.K_RIGHT and direction2 == Right:
+          if event.key == pygame.K_RIGHT and direction2 == right:
             direction2 = (0,0)
 
-    if Boom.colliderect(space):
+    if boom.colliderect(space):
       Dead = True
     space.move_ip(direction)
-    Boom.move_ip(direction2)
-    window.fill((Black))
+    boom.move_ip(direction2)
+    window.fill((black))
     clock.tick(30)
     if rect:
-      if not Dead: window.blit(Rock,Boom)
-      window.blit(Ship,space)
+      if not Dead: window.blit(rock,boom)
+      window.blit(ship,space)
         #update the display
       pygame.display.update()
-      Color = (130, 252, 100)
-      Color2 = (0,0,100)
+      color = (130, 252, 100)
+      color2 = (0,0,100)
       
     if space.top < 0: 
      space.bottom = 480
@@ -134,15 +184,15 @@ while running:
       space.left = 0
       
       
-    if Boom.top < 0: 
-     Boom.bottom = 480
-    if Boom.bottom > 480: 
-     Boom.top = 0
+    if boom.top < 0: 
+     boom.bottom = 480
+    if boom.bottom > 480: 
+     boom.top = 0
      
-    if Boom.left < 0: 
-      Boom.right = 640
-    if Boom.right > 640: 
-      Boom.left = 0
+    if boom.left < 0: 
+      boom.right = 640
+    if boom.right > 640: 
+      boom.left = 0
     
 #this code will only run when the loop is stopped
 pygame.quit()

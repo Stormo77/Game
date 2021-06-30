@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 #the code for your game has to go between these two lines
 
 #create a window object
-space = pygame.Rect(0,0,0,0)
+space = pygame.Rect(300,0,0,0)
 boom = pygame.Rect(300,0,0,0)
 ship = pygame.image.load('Ship.png')
 rock = pygame.image.load('Rock.png')
@@ -22,42 +22,36 @@ width = 640
 color = (130, 252, 100)
 color2 = (0,0,100)
 black = (0,0,0)
-
-
 #Code for the direction that the objects move.
 left  = (-5, 0)
 right = (5, 0)
 up    = (0, -5)
 down  = (0, 5)
-
-
 direction = (0,0)
 direction2 = (0,0)
-
 rect  = False
 acc = 0.5
 fric = -0.12
 fps = 60
- 
 FramePerSec = pygame.time.Clock()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        self.identity = False
         self.surf =pygame.image.load('Ship.png')
-        self.surf.fill((128,255,40))
-        self.rect = self.surf.get_rect()
         self.dead = False
+        self.pos = pygame.math.Vector2((550,400))
+        self.rect = self.surf.get_rect(center = self.pos)
     def move(self, direction):
         self.move_ip = direction
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.surf =pygame.image.load('Rock.png')
-        self.surf.fill((128,255,40))
         self.rect = self.surf.get_rect()
         self.dead = False
-
+        self.identity = False
 P1 = Player()
 P2 = Enemy()
 
@@ -92,7 +86,6 @@ while running:
         print(event)
         pygame.mouse.get_rel()
         pygame.mouse.set_visible(True)
-        pygame.display.update()
         if event.type == pygame.QUIT:
             #exit the game if x in the corner clicked
             running = False
@@ -105,13 +98,14 @@ while running:
               # pygame.draw.rect(window,Color, space)
               dead = False
               rect = True
+              identity = True
               space.topleft = (0,0)
               boom.bottomright = (640,480)
             elif rect and event.key == pygame.K_RETURN:
-               rect = False 
+               rect = False
+               identity = False 
             #moves the object in a direction                    
             elif event.key == pygame.K_w and rect:
-              
               direction = up
             elif event.key == pygame.K_s and rect:      
               direction = down   
@@ -158,7 +152,11 @@ while running:
             direction2 = (0,0)
           if event.key == pygame.K_RIGHT and direction2 == right:
             direction2 = (0,0)
-
+    
+    for entity in all_sprites:
+          window.blit(entity.surf,entity.rect)
+    pygame.display.update()
+  
     if boom.colliderect(space):
       Dead = True
     space.move_ip(direction)
@@ -172,11 +170,11 @@ while running:
       pygame.display.update()
       color = (130, 252, 100)
       color2 = (0,0,100)
-      
+   
     if space.top < 0: 
-     space.bottom = 480
+      space.bottom = 480
     if space.bottom > 480: 
-     space.top = 0
+      space.top = 0
      
     if space.left < 0: 
       space.right = 640

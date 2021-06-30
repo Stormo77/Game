@@ -122,7 +122,3 @@ happens after the main game loop is finished.
 At a minimum it will be pygame quit to close the program.
 """
 pygame.quit()
-
-
-
-

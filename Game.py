@@ -76,7 +76,6 @@ while running:
     #loop through each event in the list
     for event in list_of_events:
         #print each event to console for debuging
-        print(event)
         if event.type == pygame.QUIT:
             #exit the game if x in the corner clicked
             running = False
@@ -109,6 +108,11 @@ while running:
     for entity in all_sprites:
           window.blit(entity.surf,entity.rect)
     #update the display
+    endgame = pygame.sprite.collide_rect(P1, P2)
+    if endgame:
+      print('hello')
+      running = False
+          
     pygame.display.update()
     
     clock.tick(fps)
@@ -133,6 +137,7 @@ while running:
     #   boom.right = height
     # if boom.right > height: 
     #   boom.left = 0
-    
+if running  == False:
+      
 #this code will only run when the loop is stopped
 pygame.quit()

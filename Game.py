@@ -2,80 +2,153 @@
 import pygame
 from pygame.locals import *
 import random
-
-from pygame.time import Clock
+from enum import Enum
+import time
+from pygame.time import Clock, wait
 vec = pygame.math.Vector2
 
 pygame.init()
-clock = pygame.time.Clock()
 
-#color the window background
+
+#Numbers converted to names
 height = 480
 width = 640
+zero = 0
 #colors for game
 black = (0,0,0)
-#Code for the direction that the objects move.
+white = (255,255,255)
+#frames
 fps = 60
+win = False
+#time
+start_time = time.time()
+game_duration = 120
+#game states for gameover, menu and running
+class EGameState(Enum):
+  gsmenu = 1
+  gsrunning = 2
+  gsgameover = 3
+  gsgameending = 4
 
-
-class Player(pygame.sprite.Sprite):
+GameState = EGameState.gsmenu
+#Classes for game
+class MySprite(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.identity = False
-        self.surf =pygame.image.load('Ship.png')
         self.dead = False
-        self.pos = pygame.math.Vector2((550,400))
-        self.rect = self.surf.get_rect(center = self.pos)
     def move(self, direction):
         #self.move_ip = direction
         if direction == 'left':
-            self.pos.x += -10
+            self.pos.x += -2.5
         elif direction == 'right':
-            self.pos.x += +10
+            self.pos.x += +2.5
         elif direction == 'up':
-            self.pos.y += -10
+            self.pos.y += -2.5
         elif direction == 'down':
-            self.pos.y += +10
+            self.pos.y += +2.5
+        #Makes Screen have a border that the Sprites cannot cross   
+        if self.pos.x - self.rect.width  / 2 <= zero:
+          self.pos.x = self.rect.width  / 2
+          
+        if self.pos.x + self.rect.width / 2 >= width:
+          self.pos.x = width - self.rect.width / 2
+          
+        if self.pos.y - self.rect.height /2 <= zero:
+          self.pos.y = self.rect.height / 2
+          
+        if self.pos.y + self.rect.height /2 >= height:
+          self.pos.y = height- self.rect.height /2
+            
+        #code for debuging movement      
         self.rect.center = self.pos
+        #print(self.rect.center)
+        #print(self.pos)
+        #print(self.pos.x - self.rect.width /2)
         
-class Enemy(pygame.sprite.Sprite):
+        
+   #for endgame text and clock
+def displaytext(window,message,x,y):
+  font = pygame.font.Font("freesansbold.ttf",32)
+  renderedtext = font.render(message,True,white)
+  textRect = renderedtext.get_rect()
+  textRect.center =(x, y)
+  window.blit(renderedtext,textRect)
+
+#def humanitywin(window,message,x,y):
+ #font = pygame.font.Font("freesansbold.ttf",32)
+ #renderedtext = font.render(message,True,white)
+ # textRect = renderedtext.get_rect()
+ # textRect.center =(x, y)
+ #window.blit(renderedtext,textRect)   
+ 
+ #def alienwin(window,message,x,y):
+ #font = pygame.font.Font("freesansbold.ttf",32)
+ #renderedtext = font.render(message,True,white)
+ # textRect = renderedtext.get_rect()
+ # textRect.center =(x, y)
+ #window.blit(renderedtext,textRect)        
+     
+class Enemy(MySprite):
+    def __init__(self):
+        super().__init__()
+        self.surf =pygame.image.load('Ship.png')
+        self.pos = pygame.math.Vector2((550,400))
+        self.rect = self.surf.get_rect(center = self.pos)
+    def reset(self):
+        self.pos = pygame.math.Vector2((550,400))
+        self.rect = self.surf.get_rect(center = self.pos)          
+    def process(self):
+       pressed_keys = pygame.key.get_pressed()
+       if pressed_keys[K_LEFT]:
+        self.move('left') 
+       if pressed_keys[K_RIGHT]:
+        self.move('right') 
+       if pressed_keys[K_UP]:
+        self.move('up') 
+       if pressed_keys[K_DOWN]:
+        self.move('down') 
+         
+        
+class Player(MySprite):
     def __init__(self):
         super().__init__()
         self.surf =pygame.image.load('Rock.png')
-        self.rect = self.surf.get_rect()
-        self.dead = False
         self.pos = pygame.math.Vector2((100,100))
-        self.rect = self.surf.get_rect(center = self.pos)
-        self.identity = False
-    def move(self, direction):
-      if direction == 'left':
-        self.pos.x += -10
-      elif direction == 'right':
-        self.pos.x += +10
-      elif direction == 'up':
-        self.pos.y += -10
-      elif direction == 'down':
-        self.pos.y += +10
-      self.rect.center = self.pos
-P1 = Player()
-P2 = Enemy()
-
-all_sprites = pygame.sprite.Group()
-all_sprites.add(P1)
-all_sprites.add(P2)
-  
-window = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Alien Invaders")  
-#fill window
-window.fill((black))
-
-#game loop
+        self.rect = self.surf.get_rect(center = self.pos)          
+    def reset(self):
+        self.pos = pygame.math.Vector2((100,100))
+        self.rect = self.surf.get_rect(center = self.pos)          
+    def process(self):
+       pressed_keys = pygame.key.get_pressed()
+       if pressed_keys[K_a]:
+        self.move('left') 
+       if pressed_keys[K_d]:
+        self.move('right') 
+       if pressed_keys[K_w]:
+        self.move('up') 
+       if pressed_keys[K_s]:
+        self.move('down')          
+        
 running = True #game state 
-while running:
+game_over_at = 0
+
+def process(sprites, P1, P2):
+    global running
+    global GameState
+    global game_over_at
+    global start_time
     list_of_events = pygame.event.get()
+    #debug code
+    #print(GameState)
+    
+    if GameState != EGameState.gsgameending:
+      for entity in sprites:
+        entity.process()
+      
     #loop through each event in the list
     for event in list_of_events:
-        #print each event to console for debuging
+        # print each event to console for debuging
         if event.type == pygame.QUIT:
             #exit the game if x in the corner clicked
             running = False
@@ -85,59 +158,96 @@ while running:
                 #if the escape key is pressed quit the game.
                 running = False
             #moves the object in a direction                    
-            elif event.key == pygame.K_w:
-              P1.move('up')
-            elif event.key == pygame.K_s:      
-              P1.move('down')  
-            elif event.key == pygame.K_a:  
-              P1.move('left') 
-            elif event.key == pygame.K_d: 
-              P1.move('right')
-           #moves the Boom Object
-           #moves the object in a direction                    
-            elif event.key == pygame.K_UP:
-              P2.move('up')
-            elif event.key == pygame.K_DOWN:      
-              P2.move('down')  
-            elif event.key == pygame.K_LEFT:  
-              P2.move('left')
-            elif event.key == pygame.K_RIGHT: 
-              P2.move('right')
-    
-    window.fill((black))
-    for entity in all_sprites:
-          window.blit(entity.surf,entity.rect)
-    #update the display
-    endgame = pygame.sprite.collide_rect(P1, P2)
-    if endgame:
-      print('hello')
-      running = False
+            elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                if GameState == EGameState.gsmenu:
+                    GameState = EGameState.gsrunning
+                    start_time = time.time()
+    if GameState == EGameState.gsgameending and time.time() - game_over_at > 10:
+          reset_game_state()
+          #code for debug
+          #print('game state reset')
           
-    pygame.display.update()
+    if time.time() - start_time > game_duration and GameState != EGameState.gsgameending:
+      game_over()    
+      #GameState = EGameState.gsgameover   
+      #code for debug                 
+      #print('Game over state set')
+#code for starting menu to display title page
+def rendermenu(window):
+    BackgroundImage = pygame.image.load("TitlepageGame.png") 
+    window.blit(BackgroundImage,(0,0))
+#code for game running     
+def renderrunning(sprites, window):
+  for entity in sprites:
+    window.blit(entity.surf,entity.rect) 
+  #part of code for clock
+  timelapsed = round(time.time()-start_time)
+  timeremaining = game_duration - timelapsed
+  displaytext(window, str(timeremaining),width//2,25)
+ #code for game over   
+def rendergameover(window):
+    BackgroundImage = pygame.image.load("Gameoverpage.png") 
+    window.blit(BackgroundImage,(0,0))
+#code to set the gamestate and what window is what   
+def render(sprites, window):
+  window.fill((black))
+  if GameState == EGameState.gsrunning:
+    renderrunning(sprites, window)
+  elif GameState == EGameState.gsgameending:
+      rendergameover(window)
+  elif GameState == EGameState.gsmenu:
+      rendermenu(window)   
+ #to reset the game so you dont have to restart game again to play     
+def reset_game_state():
+  global start_time
+  global GameState
+  start_time = time.time()
+  P1.reset()
+  P2.reset()
+  GameState = EGameState.gsmenu
+
+#sprites and group for sprite
+P1 = Player()
+P2 = Enemy()
+
+all_sprites = pygame.sprite.Group()
+all_sprites.add(P1)
+all_sprites.add(P2)
+ #code for the window's title and the display mode 
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Evaders")  
+#fill window
+window.fill((black))
+#game over feature, helps resets game
+def game_over():
+    global GameState
+    global game_over_at
+    global win
+    #code for debug
+    #print('Game Over')
+    GameState = EGameState.gsgameending
+    game_over_at = time.time()
+    if win ==True:
+     #humanitywin(window, str(timeremaining),width//2,25)
+     pass
+    else:
+     #alienwin(window, str(timeremaining),width//2,25)
+     pass
+#game loop
+while running:
     
-    clock.tick(fps)
-   
-    # if space.top < 0: 
-    #   space.bottom = width
-    # if space.bottom > width: 
-    #   space.top = 0
-     
-    # if space.left < 0: 
-    #   space.right = height
-    # if space.right > height: 
-    #   space.left = 0
-      
-      
-    # if boom.top < 0: 
-    #  boom.bottom = width
-    # if boom.bottom > width: 
-    #  boom.top = 0
-     
-    # if boom.left < 0: 
-    #   boom.right = height
-    # if boom.right > height: 
-    #   boom.left = 0
+    process(all_sprites, P1, P2)  
+    render(all_sprites, window)
+    #update the display
+    if GameState != EGameState.gsgameending:
+      endgame = pygame.sprite.collide_rect(P1, P2)
+      if endgame:
+       win= True
+      if endgame or GameState == EGameState.gsgameover:
+        game_over()  
+    pygame.display.update()
+
 if running  == False:
       
 #this code will only run when the loop is stopped
-pygame.quit()
+ pygame.quit()

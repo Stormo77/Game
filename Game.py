@@ -8,7 +8,7 @@ from pygame.time import Clock, wait
 vec = pygame.math.Vector2
 
 pygame.init()
-
+clock = pygame.time.Clock()
 
 #Numbers converted to names
 height = 480
@@ -74,25 +74,20 @@ def displaytext(window,message,x,y):
   textRect = renderedtext.get_rect()
   textRect.center =(x, y)
   window.blit(renderedtext,textRect)
-
-#def humanitywin(window,message,x,y):
- #font = pygame.font.Font("freesansbold.ttf",32)
- #renderedtext = font.render(message,True,white)
- # textRect = renderedtext.get_rect()
- # textRect.center =(x, y)
- #window.blit(renderedtext,textRect)   
+#show who wins game
+def showwin(window,message,x,y):
+  font = pygame.font.Font("freesansbold.ttf",32)
+  renderedtext = font.render(message,True,white)
+  textRect = renderedtext.get_rect()
+  textRect.center =(x, y)
+  window.blit(renderedtext,textRect)   
  
- #def alienwin(window,message,x,y):
- #font = pygame.font.Font("freesansbold.ttf",32)
- #renderedtext = font.render(message,True,white)
- # textRect = renderedtext.get_rect()
- # textRect.center =(x, y)
- #window.blit(renderedtext,textRect)        
-     
+      
 class Enemy(MySprite):
     def __init__(self):
         super().__init__()
-        self.surf =pygame.image.load('Ship.png')
+        image =  pygame.image.load('Ship.png') 
+        self.surf = image
         self.pos = pygame.math.Vector2((550,400))
         self.rect = self.surf.get_rect(center = self.pos)
     def reset(self):
@@ -186,8 +181,16 @@ def renderrunning(sprites, window):
   displaytext(window, str(timeremaining),width//2,25)
  #code for game over   
 def rendergameover(window):
+    global win
     BackgroundImage = pygame.image.load("Gameoverpage.png") 
     window.blit(BackgroundImage,(0,0))
+    if win ==True:
+     showwin(window, 'Humanity win',width//2,300)
+    else:
+     showwin(window, 'Alien win',width//2,300)
+    
+    
+    
 #code to set the gamestate and what window is what   
 def render(sprites, window):
   window.fill((black))
@@ -227,12 +230,7 @@ def game_over():
     #print('Game Over')
     GameState = EGameState.gsgameending
     game_over_at = time.time()
-    if win ==True:
-     #humanitywin(window, str(timeremaining),width//2,25)
-     pass
-    else:
-     #alienwin(window, str(timeremaining),width//2,25)
-     pass
+
 #game loop
 while running:
     
@@ -246,7 +244,7 @@ while running:
       if endgame or GameState == EGameState.gsgameover:
         game_over()  
     pygame.display.update()
-
+    clock.tick(fps)
 if running  == False:
       
 #this code will only run when the loop is stopped
